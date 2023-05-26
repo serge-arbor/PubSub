@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-pubsub-app
+spec:
+  template:
+    spec:
+      containers:
+      - name: my-app-container
+        image: my-app-image
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: pubsub-key
+env:
+- name: GOOGLE_APPLICATION_CREDENTIALS
+  value: /var/secrets/google/key.json

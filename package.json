@@ -1,0 +1,19 @@
+{
+  "name": "pubsub-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/pubsub": "^3.6.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.0.1"
+  }
+}
