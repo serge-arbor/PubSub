@@ -1,6 +1,8 @@
 const { PubSub, v1 } = require('@google-cloud/pubsub');
 const fs = require('fs');
 const MessageWorker = require('./Worker');
+const MetricsHelper = require('./MetricsHelper');
+const KubeHelper = require('./KubeHelper');
 
 class Api {
   constructor(keyFilename) {
@@ -8,9 +10,14 @@ class Api {
     this.projectId = keyFile.project_id;
 
     this.pubSubClient = new PubSub({ keyFilename });
+
     this.subClient = new v1.SubscriberClient({ keyFilename });
 
     this.messageWorker = new MessageWorker(this.subClient);
+
+    this.metricsHelper = new MetricsHelper(this.pubSubClient, this.projectId);
+    
+    this.kubeHelper = new KubeHelper();
   }
 
   // Topics
@@ -91,6 +98,32 @@ class Api {
       console.error(`Error occurred while trying to get subscription ${subscriptionName}: `, error);
       throw error;
     }
+  }
+
+  async getTopicSubscriptions(topicName) {
+    try {
+      const [subscriptions] = await this.pubSubClient.topic(topicName).getSubscriptions();
+  
+      if (subscriptions.length === 0) {
+        console.log(`No subscriptions found for topic '${topicName}'.`);
+        return;
+      }
+  
+      console.log(`Subscriptions for topic '${topicName}':`);
+      subscriptions.forEach(subscription => {
+        console.log(subscription.name);
+      });
+    } catch (error) {
+      console.error(`Error occurred while fetching subscriptions for topic '${topicName}':`, error);
+    }
+  }
+  
+  getMetricsHelper() {
+    return this.metricsHelper
+  }
+
+  getKubeHelper() {
+    return this.kubeHelper
   }
 }
 
