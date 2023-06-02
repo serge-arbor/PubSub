@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD [ "node", "subscriber.js" ]
+CMD [ "node", "src/subscriber.js" ]
