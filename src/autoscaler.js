@@ -1,4 +1,5 @@
 const client = require('./init_client');
+const path = require('path');
 
 const serviceName = 'pubsub-node'
 const topicName = 'test-topic';
@@ -8,41 +9,49 @@ async function everyMinute() {
   const subs = await client.getTopicSubscriptions(topicName);
 
   const unackedMessagesMetricName = 'pubsub.googleapis.com/subscription/num_undelivered_messages';
-  const totalProcessingTime = 0;
   const latencyPeriodSeconds = 60*60;
   const latencyMetricName = 'pubsub.googleapis.com/subscription/ack_latencies';
+  let totalProcessingTime = 0;
 
   for (const subscription of subs) {
+    const subscriptionName = path.basename(subscription.name);
+
     const unackedMessages = await client.getMetricsHelper().fetchMetricSingleValue(
-      subscription.name, 
+      subscriptionName, 
       unackedMessagesMetricName,
-      6000
+      600
     );
 
-    console.log('>> unackedMessages', unackedMessages);
-
-    if (unackedMessages === 0) { // need to scale down
-
-    } else { // need to scale up
-
-    }
-
     const numberOfPods = await client.getKubeHelper().getPodCountForService('default', serviceName);
-    console.log('>> numberOfPods', numberOfPods);
 
     const averageProcessingTime = await client.getMetricsHelper().fetchMetricSingleValue(
-      subscription.name,
+      subscriptionName,
       latencyMetricName, 
       latencyPeriodSeconds,
       'ALIGN_SUM'
     );
 
+    console.log('>> unackedMessages', unackedMessages);
+    console.log('>> numberOfPods', numberOfPods);
     console.log('>> averageProcessingTime', averageProcessingTime);
 
-    const processingTime = unackedMessages * numberOfPods
-    // totalProcessingTime += processingTime;  
-  };
+    if (unackedMessages > 0) { // need to scale up
 
+    } else { // need to scale down
+
+    }
+
+    totalProcessingTime += (unackedMessages * averageProcessingTime);
+  }
+  
+  const podsNeeded = calcNeededPODsNumber(totalProcessingTime, concurrency, averageProcessingTime);
+
+}
+
+function calcNeededPODsNumber(unackedMessages, concurrency, averageProcessingTime, totalProcessingTime) {
+  const podsNeeded = Math.ceil(unackedMessages / concurrency);
+  console.log('>> podsNeeded', podsNeeded);
+  return podsNeeded;
 }
 
 everyMinute();

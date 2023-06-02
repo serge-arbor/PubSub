@@ -70,7 +70,7 @@ class Api {
 
     if (response.receivedMessages.length === 0) {
       console.log('No messages received.');
-      return;
+      return 0;
     }
 
     const processPromises = response.receivedMessages.map(message =>
@@ -80,6 +80,7 @@ class Api {
     await Promise.all(processPromises);
 
     console.log('Done.');
+    return processPromises.length;
   }
 
 
