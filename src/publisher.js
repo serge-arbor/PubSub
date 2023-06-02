@@ -1,8 +1,5 @@
-const StqPubSubApi = require('./StqPubSub/Api');
+const client = require('./init_client');
 const { faker } = require('@faker-js/faker');
-
-// Replace 'path_to_your_keyfile' with the actual path to your key.json file.
-const client = new StqPubSubApi('key.json');
 
 async function run() {
   // Replace 'your_topic' with your actual topic name.

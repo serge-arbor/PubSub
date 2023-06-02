@@ -113,6 +113,7 @@ class Api {
       subscriptions.forEach(subscription => {
         console.log(subscription.name);
       });
+      return subscriptions;
     } catch (error) {
       console.error(`Error occurred while fetching subscriptions for topic '${topicName}':`, error);
     }

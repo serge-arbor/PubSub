@@ -1,39 +1,48 @@
-const StqPubSubApi = require('./StqPubSub/Api');
-
-// Replace 'path_to_your_keyfile' with the actual path to your key.json file.
-const client = new StqPubSubApi('key.json');
+const client = require('./init_client');
 
 const serviceName = 'pubsub-node'
 const topicName = 'test-topic';
 const concurrency = 1;
 
-function everyMinute() {
-  const subs = client.getTopicSubscriptions(topicName);
-  console.log(subs);
+async function everyMinute() {
+  const subs = await client.getTopicSubscriptions(topicName);
 
   const unackedMessagesMetricName = 'pubsub.googleapis.com/subscription/num_undelivered_messages';
   const totalProcessingTime = 0;
   const latencyPeriodSeconds = 60*60;
   const latencyMetricName = 'pubsub.googleapis.com/subscription/ack_latencies';
 
-
-  for(subscriptionName in subs){
-    console.log(sub)
-    const unackedMessages = client.getMetricsHelper().fetchMetricSingleValue(
-      subscriptionName, 
+  for (const subscription of subs) {
+    const unackedMessages = await client.getMetricsHelper().fetchMetricSingleValue(
+      subscription.name, 
       unackedMessagesMetricName,
-
+      6000
     );
-    const numberOfPods = client.getKubeHelper().getPodCountForService(serviceName);
-    const averageProcessingTime = client.getMetricsHelper().fetchMetricSingleValue(
-      subscriptionName,
+
+    console.log('>> unackedMessages', unackedMessages);
+
+    if (unackedMessages === 0) { // need to scale down
+
+    } else { // need to scale up
+
+    }
+
+    const numberOfPods = await client.getKubeHelper().getPodCountForService('default', serviceName);
+    console.log('>> numberOfPods', numberOfPods);
+
+    const averageProcessingTime = await client.getMetricsHelper().fetchMetricSingleValue(
+      subscription.name,
       latencyMetricName, 
       latencyPeriodSeconds,
       'ALIGN_SUM'
     );
+
+    console.log('>> averageProcessingTime', averageProcessingTime);
+
     const processingTime = unackedMessages * numberOfPods
     // totalProcessingTime += processingTime;  
   };
+
 }
 
 everyMinute();

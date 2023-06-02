@@ -36,7 +36,7 @@ class MetricsHelper {
 
       if (response.length === 0) {
         console.log(`${metricType}. No data found for the metric.`);
-        return;
+        return null;
       }
 
       const latestValue = response[0].points[0].value;

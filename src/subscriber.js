@@ -1,9 +1,5 @@
-const StqPubSubApi = require('./StqPubSub/Api');
+const client = require('./init_client');
 const processorFunction = require('./processor'); // Replace with your actual worker function
-
-// Replace 'path_to_your_keyfile' with the actual path to your key.json file.
-const pubSubClient = new StqPubSubApi('key.json');
-
 const concurrency = 100;
 
 async function processMessagesInBackground() {
@@ -12,7 +8,7 @@ async function processMessagesInBackground() {
   while (true) {
     try {
       console.log(`Fetching and processing ${concurrency} messages...`);
-      await pubSubClient.pullAndProcessWithLeaseManagement(subscriptionName, processorFunction, concurrency);
+      await client.pullAndProcessWithLeaseManagement(subscriptionName, processorFunction, concurrency);
     } catch (error) {
       console.error('An error occurred while fetching and processing messages:', error);
     }

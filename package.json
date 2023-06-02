@@ -13,7 +13,8 @@
   "dependencies": {
     "@google-cloud/monitoring": "^3.0.4",
     "@google-cloud/pubsub": "^3.6.0",
-    "@kubernetes/client-node": "^0.18.1"
+    "@kubernetes/client-node": "^0.18.1",
+    "dotenv": "^16.1.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.0.1"
