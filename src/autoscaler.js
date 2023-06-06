@@ -12,6 +12,7 @@ async function everyMinute() {
   const latencyPeriodSeconds = 60*60;
   const latencyMetricName = 'pubsub.googleapis.com/subscription/ack_latencies';
   let totalProcessingTime = 0;
+  let totalAverageProcessingTime = 0;
 
   for (const subscription of subs) {
     const subscriptionName = path.basename(subscription.name);
@@ -29,7 +30,7 @@ async function everyMinute() {
       latencyMetricName, 
       latencyPeriodSeconds,
       'ALIGN_SUM'
-    );
+    ) || 0;
 
     console.log('>> unackedMessages', unackedMessages);
     console.log('>> numberOfPods', numberOfPods);
@@ -41,17 +42,14 @@ async function everyMinute() {
 
     }
 
-    totalProcessingTime += (unackedMessages * averageProcessingTime);
+    
+
+
+    // totalProcessingTime += (unackedMessages * averageProcessingTime);
+    const podsNeeded = unackedMessages / concurrency;
+
   }
   
-  const podsNeeded = calcNeededPODsNumber(totalProcessingTime, concurrency, averageProcessingTime);
-
-}
-
-function calcNeededPODsNumber(unackedMessages, concurrency, averageProcessingTime, totalProcessingTime) {
-  const podsNeeded = Math.ceil(unackedMessages / concurrency);
-  console.log('>> podsNeeded', podsNeeded);
-  return podsNeeded;
 }
 
 everyMinute();

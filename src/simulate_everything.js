@@ -1,6 +1,6 @@
 const client = require('./init_client');
 const { faker } = require('@faker-js/faker');
-const processorFunction = require('./processor'); // Replace with your actual worker function
+const processorFunction = require('./simulate_processor'); // Replace with your actual worker function
 const concurrency = 100;
 
 async function publishRandomNMessages() {
